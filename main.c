@@ -1,52 +1,38 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "main.h"
 
-int main(int argc, char **argv)
+#define MAX_INPUT_LENGTH 1024
+
+/**
+* main - main function
+* Return: 1
+*/
+
+int main(void)
 {
-    char *prompt = "(KShell)😄 ";
-    char *lineptr;
-    /*copy of variable that stores the string read by getline*/
-    char *lineptr_cpy; 
-    size_t n = 0;
-    __ssize_t num_count;
-    
-    
-    /*Add void variable to silence the compiler.
-    This is done because we have not used function parameters.*/
-    (void)argc, (void)argv;
+	size_t n = 0;
+	char *line = NULL;
+	char **split_words = NULL;
 
 
-    while(1) 
-    /*The loops means it will continue to execute indefinitely 
-    until the program is terminated externally*/
-    {
-        printf("%s", prompt);
-        num_count = getline(&lineptr, &n, stdin);
-        /*Variable num_count holds return value for getline*/
-        if (num_count == -1)
-        /*The EOF encountered when user presses (ctrl + d)
-        which returns a value of (-1)*/
-        {
-            printf("Exiting 😞....\n");
-            return(-1);
-        }
 
-        printf("%s \n",lineptr);
+	while (1)
+	{
+		print_prompt();
+		if (getline(&line, &n, stdin) == -1)
+		{
+			printf("Exiting 😞....\n");
+			break;
+		}
 
-        
-    }
-    /*allocate memory to the copy of string read*/
-    lineptr_cpy = malloc(sizeof(char) * num_count);
-    if (lineptr_cpy == NULL)
-    {
-        perror("Error in memory allocation");
-        return(-1);
-    }
+		split_words = split_str(line);
 
-    /*make a copy of lineptr*/
-    strcpy(lineptr_cpy, lineptr);
-    
-    free(lineptr);
-    return(0);
+		if (exec_cmd(split_words) == 1)
+			continue;
+		else
+			return (0);
+	}
+
+	free(line);
+	return (1);
+
 }
